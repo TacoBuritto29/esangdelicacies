@@ -2,7 +2,7 @@
 
 ## Please Read Before Using
 
-- Please use **only the datas** in the database first located in:  
+- Please use **only the datas** in the database first located in:  Storage/esang_db
 - Other files cannot be transferred due to hidden data.  
 - Other modules are still **not finished**.  
 - If there's a **new file**, make sure to:
