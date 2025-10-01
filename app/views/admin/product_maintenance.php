@@ -18,19 +18,19 @@
             </div>
             <div class="profile-name"><span>Admin</span></div>
         </div>
-        <a href="admin_dashboard.html" class="sidenav-item"><i class="fas fa-th-large"></i> Dashboard</a>
-        <a href="#" class="sidenav-item"><i class="fas fa-clipboard-list"></i> Order status</a>
+        <a href="admin_dashboard.php" class="sidenav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a href="admin_order_status.php" class="sidenav-item"><i class="fas fa-clipboard-list"></i> Order status</a>
         <div class="dropdown">
             <a href="#" class="sidenav-item dropdown-btn"><i class="fas fa-box"></i> Product Maintenance <i class="fas fa-caret-down"></i></a>
             <div class="dropdown-content">
                 <a href="product_maintenance.php">&bull; add item</a>
                 <a href="manage_items.php">&bull; manage item</a>
-                <a href="#">&bull; coupons</a>
+                <a href="coupons.php">&bull; coupons</a>
             </div>
         </div>
-        <a href="#" class="sidenav-item"><i class="fas fa-users"></i> User Maintenance</a>
-        <a href="admin_performance.html" class="sidenav-item"><i class="fas fa-file-alt"></i> Analytics & Sales and Transaction History</a>
-        <a href="admin_profile.html" class="sidenav-item"><i class="fas fa-user-circle"></i> Profile</a>
+        <a href="user_maintenance.php" class="sidenav-item"><i class="fas fa-users"></i> User Maintenance</a>
+        <a href="admin_performance.php" class="sidenav-item"><i class="fas fa-file-alt"></i> Analytics & Sales and Transaction History</a>
+        <a href="admin_profile.php" class="sidenav-item"><i class="fas fa-user-circle"></i> Profile</a>
         <a href="#" class="sidenav-item" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a>
     </div>
 
@@ -199,4 +199,5 @@
     <script src="../VJavaScript/sidebar.js"></script>
     <script src="../VJavaScript/product_maintenance.js"></script>
 </body>
+
 </html>
