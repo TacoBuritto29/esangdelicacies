@@ -1,0 +1,95 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+}
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.controls input, .controls select, .controls button {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.view-buttons button {
+    cursor: pointer;
+    background-color: #FFC222;
+    border: 1px solid #FFC222;
+    transition: background-color 0.3s;
+}
+.view-buttons button.active {
+    background-color: #d9534f;
+    color: white;
+    border-color: #d9534f;
+}
+.view-buttons button:hover:not(.active) {
+    background-color: #f5b921;
+}
+.inventory-table h2 {
+    margin-top: 0;
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+.inventory-table {
+    padding: 20px;
+    margin-top: 20px;
+    display: none; /* Hide all tables by default */
+}
+
+.inventory-table.active {
+    display: block; /* Show the active table */
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    border-radius: 0.75rem;
+    overflow: hidden; /* This is key for rounded corners on the table */
+}
+th {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: #6b7280;
+    letter-spacing: 0.05em;
+}
+th, td {
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+td {
+    color: #4b5563;
+}
+thead {
+    background-color: #e5e7eb;
+}
+tbody,tr {
+    border-bottom: 1px solid #e5e7eb; /* Gray-200 */
+    transition: background-color 0.2s ease-in-out;
+}
+tbody tr:hover {
+    background-color: #f9fafb;
+}
+.status {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+/* New status classes */
+.status-high {
+    background-color: #d4edda; /* Light green */
+    color: #155724; /* Dark green */
+}
+.status-medium {
+    background-color: #fff3cd; /* Light yellow */
+    color: #856404; /* Dark yellow */
+}
+.status-low {
+    background-color: #f8d7da; /* Light red */
+    color: #721c24; /* Dark red */
+}
