@@ -1,0 +1,282 @@
+-- Cleaned phpMyAdmin-style SQL Dump (Enhanced and Consistent)
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+-- ====================================
+-- DATABASE: `esang_db`
+-- ====================================
+CREATE DATABASE IF NOT EXISTS `esang_db`;
+USE `esang_db`;
+
+-- --------------------------------------------------------
+-- USER TYPES
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `admin` (
+`empId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`name` VARCHAR(100) NOT NULL,
+`password` VARCHAR(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `cashier` (
+`empId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`name` VARCHAR(100) NOT NULL,
+`password` VARCHAR(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `rider` (
+`empId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`name` VARCHAR(100) NOT NULL,
+`phoneNum` VARCHAR(15) NOT NULL,
+`plateNum` VARCHAR(15) NOT NULL,
+`password` VARCHAR(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `order_manager` (
+`empId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`name` VARCHAR(100) NOT NULL,
+`password` VARCHAR(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `customer` (
+`customerId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`name` VARCHAR(100) NOT NULL,
+`phoneNum` VARCHAR(15) NOT NULL,
+`password` VARCHAR(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- MENU / PRODUCTS
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `product` (
+`prodId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`prodName` VARCHAR(100) NOT NULL,
+`prodCategory` VARCHAR(100) NOT NULL,
+`prodPrice` DECIMAL(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- SERVICES & TRANSACTIONS
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `orders` (
+`orderId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`customerId` INT(11) NOT NULL,
+`orderManagerId` INT(11) NOT NULL,
+`orderDate` DATE NOT NULL,
+`deliveryAddress` TEXT NOT NULL,
+`totalAmount` DECIMAL(10,2) NOT NULL,
+`orderStatus` VARCHAR(50) NOT NULL,
+FOREIGN KEY (`customerId`) REFERENCES `customer`(`customerId`),
+FOREIGN KEY (`orderManagerId`) REFERENCES `order_manager`(`empId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `order_details` (
+`orderDetailId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`orderId` INT(11) NOT NULL,
+`prodId` INT(11) NOT NULL,
+`cashierId` INT(11) NOT NULL,
+`amount` DECIMAL(10,2) NOT NULL,
+`paymentMethod` VARCHAR(50),
+FOREIGN KEY (`orderId`) REFERENCES `orders`(`orderId`),
+FOREIGN KEY (`prodId`) REFERENCES `product`(`prodId`),
+FOREIGN KEY (`cashierId`) REFERENCES `cashier`(`empId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `payments` (
+`paymentId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`orderId` INT(11) NOT NULL,
+`cashierId` INT(11) NOT NULL,
+`paymentDate` DATE NOT NULL,
+`amount` DECIMAL(10,2) NOT NULL CHECK (`amount` <= 1000),
+`paymentMethod` VARCHAR(50),
+FOREIGN KEY (`orderId`) REFERENCES `orders`(`orderId`),
+FOREIGN KEY (`cashierId`) REFERENCES `cashier`(`empId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `review` (
+`reviewId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`customerId` INT(11) NOT NULL,
+`rating` VARCHAR(10),
+`comment` TEXT,
+FOREIGN KEY (`customerId`) REFERENCES `customer`(`customerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `delivery` (
+`delId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`riderId` INT(11) NOT NULL,
+`orderManagerId` INT(11) NOT NULL,
+`delStatus` VARCHAR(50),
+`plateNum` VARCHAR(15) NOT NULL,
+`delTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (`riderId`) REFERENCES `rider`(`empId`),
+FOREIGN KEY (`orderManagerId`) REFERENCES `order_manager`(`empId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `receipts` (
+`receiptId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`orderId` INT(11) NOT NULL,
+`cashierId` INT(11) NOT NULL,
+`fileName` VARCHAR(255) NOT NULL,
+`fileType` VARCHAR(50) DEFAULT 'application/pdf',
+`fileData` LONGBLOB NOT NULL,
+`uploadDate` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (`orderId`) REFERENCES `orders`(`orderId`),
+FOREIGN KEY (`cashierId`) REFERENCES `cashier`(`empId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- RETURN ORDERS
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `return_order` (
+`returnId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`orderId` INT(11) NOT NULL,
+`customerId` INT(11) NOT NULL,
+`returnDate` DATE NOT NULL DEFAULT (CURRENT_DATE),
+`reason` TEXT NOT NULL,
+`status` VARCHAR(50) DEFAULT 'Pending',
+`refundAmount` DECIMAL(10,2) DEFAULT 0.00,
+FOREIGN KEY (`orderId`) REFERENCES `orders`(`orderId`),
+FOREIGN KEY (`customerId`) REFERENCES `customer`(`customerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `return_order_details` (
+`returnDetailId` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`returnId` INT(11) NOT NULL,
+`prodId` INT(11) NOT NULL,
+`quantity` INT(11) NOT NULL,
+`amount` DECIMAL(10,2) NOT NULL,
+FOREIGN KEY (`returnId`) REFERENCES `return_order`(`returnId`),
+FOREIGN KEY (`prodId`) REFERENCES `product`(`prodId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- VIEWS
+-- --------------------------------------------------------
+DROP VIEW IF EXISTS `view_sorted_products`;
+CREATE VIEW `view_sorted_products` AS
+SELECT `prodId`, `prodName`, `prodCategory`, `prodPrice`
+FROM `product`
+ORDER BY `prodCategory`, `prodName`;
+
+DROP VIEW IF EXISTS `view_sales`;
+CREATE VIEW `view_sales` AS
+SELECT
+o.`orderId`,
+o.`orderDate`,
+o.`customerId`,
+c.`name` AS `customerName`,
+p.`paymentDate`,
+p.`amount` AS `paymentAmount`,
+p.`paymentMethod`,
+o.`totalAmount`,
+o.`orderStatus`
+FROM `orders` o
+JOIN `payments` p ON o.`orderId` = p.`orderId`
+JOIN `customer` c ON o.`customerId` = c.`customerId`
+WHERE o.`orderStatus` = 'Completed';
+
+DROP VIEW IF EXISTS `view_recommended_products`;
+CREATE VIEW `view_recommended_products` AS
+SELECT
+p.`prodId`,
+p.`prodName`,
+p.`prodCategory`,
+SUM(od.`amount`) AS `totalSales`
+FROM `order_details` od
+JOIN `product` p ON od.`prodId` = p.`prodId`
+JOIN `orders` o ON od.`orderId` = o.`orderId`
+WHERE o.`orderStatus` = 'Completed'
+GROUP BY p.`prodId`, p.`prodName`, p.`prodCategory`
+ORDER BY `totalSales` DESC
+LIMIT 10;
+
+DROP VIEW IF EXISTS `view_sales_daily`;
+CREATE VIEW `view_sales_daily` AS
+SELECT
+DATE(p.`paymentDate`) AS `saleDate`,
+SUM(p.`amount`) AS `totalSales`,
+COUNT(DISTINCT o.`orderId`) AS `totalOrders`
+FROM `orders` o
+JOIN `payments` p ON o.`orderId` = p.`orderId`
+WHERE o.`orderStatus` = 'Completed'
+GROUP BY DATE(p.`paymentDate`)
+ORDER BY `saleDate` DESC;
+
+DROP VIEW IF EXISTS `view_sales_weekly`;
+CREATE VIEW `view_sales_weekly` AS
+SELECT
+YEARWEEK(p.`paymentDate`, 1) AS `saleWeek`,
+SUM(p.`amount`) AS `totalSales`,
+COUNT(DISTINCT o.`orderId`) AS `totalOrders`
+FROM `orders` o
+JOIN `payments` p ON o.`orderId` = p.`orderId`
+WHERE o.`orderStatus` = 'Completed'
+GROUP BY YEARWEEK(p.`paymentDate`, 1)
+ORDER BY `saleWeek` DESC;
+
+DROP VIEW IF EXISTS `view_sales_monthly`;
+CREATE VIEW `view_sales_monthly` AS
+SELECT
+YEAR(p.`paymentDate`) AS `saleYear`,
+MONTH(p.`paymentDate`) AS `saleMonth`,
+SUM(p.`amount`) AS `totalSales`,
+COUNT(DISTINCT o.`orderId`) AS `totalOrders`
+FROM `orders` o
+JOIN `payments` p ON o.`orderId` = p.`orderId`
+WHERE o.`orderStatus` = 'Completed'
+GROUP BY YEAR(p.`paymentDate`), MONTH(p.`paymentDate`)
+ORDER BY `saleYear` DESC, `saleMonth` DESC;
+
+DROP VIEW IF EXISTS `view_sales_yearly`;
+CREATE VIEW `view_sales_yearly` AS
+SELECT
+YEAR(p.`paymentDate`) AS `saleYear`,
+SUM(p.`amount`) AS `totalSales`,
+COUNT(DISTINCT o.`orderId`) AS `totalOrders`
+FROM `orders` o
+JOIN `payments` p ON o.`orderId` = p.`orderId`
+WHERE o.`orderStatus` = 'Completed'
+GROUP BY YEAR(p.`paymentDate`)
+ORDER BY `saleYear` DESC;
+
+DROP VIEW IF EXISTS `view_sales_current_year`;
+CREATE VIEW `view_sales_current_year` AS
+SELECT
+o.`orderId`,
+o.`orderDate`,
+p.`paymentDate`,
+p.`amount`,
+c.`name` AS `customerName`
+FROM `orders` o
+JOIN `payments` p ON o.`orderId` = p.`orderId`
+JOIN `customer` c ON o.`customerId` = c.`customerId`
+WHERE o.`orderStatus` = 'Completed'
+AND YEAR(p.`paymentDate`) = YEAR(CURDATE());
+
+DROP VIEW IF EXISTS `view_sales_current_month`;
+CREATE VIEW `view_sales_current_month` AS
+SELECT
+o.`orderId`,
+o.`orderDate`,
+p.`paymentDate`,
+p.`amount`,
+c.`name` AS `customerName`
+FROM `orders` o
+JOIN `payments` p ON o.`orderId` = p.`orderId`
+JOIN `customer` c ON o.`customerId` = c.`customerId`
+WHERE o.`orderStatus` = 'Completed'
+AND MONTH(p.`paymentDate`) = MONTH(CURDATE())
+AND YEAR(p.`paymentDate`) = YEAR(CURDATE());
+
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
